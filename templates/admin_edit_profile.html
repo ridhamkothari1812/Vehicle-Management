@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Admin Profile{% endblock %}
+
+{% block body %}
+
+<div class="centered-form">
+    <h2 class="text-center mb-4">Edit Profile</h2>
+    <form method="post">
+        <div class="mb-3">
+            <label for="username" class="form-label">New Username</label>
+            <input id="username" type="email" class="form-control" name="Username" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Please enter valid email" autofocus required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">New Password</label>
+            <input id="password" type="password" class="form-control" name="Password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,12}" title="Password must be 8-12 characters long with atleast 1 num, and 1 uppercase and 1 lowercase alphabet." required>
+            <input type="checkbox" class="form-check-input" id="showPassword" onclick="togglePassword()">
+            <label class="form-check-label" for="showPassword">Show Password</label>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-success">Save Changes</button>
+            <a href="{{ url_for('admin_routes.admin_dashboard') }}" class="btn btn-secondary ms-3">Cancel</a>
+        </div>
+        
+    </form>
+</div>
+
+<script>
+    function togglePassword(){
+        const passwordInput = document.getElementById('password');
+        passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+    }
+</script>
+
+{% endblock %}

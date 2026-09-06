@@ -1,0 +1,202 @@
+from flask import render_template, request, redirect, url_for, session, Blueprint
+from models import db, User, ParkingLot, ParkingSpot, ReserveParkingSpot
+from flask_login import login_required, current_user
+import re
+
+admin_routes = Blueprint('admin_routes', __name__)
+
+@admin_routes.route('/admin-dashboard')
+@login_required
+def admin_dashboard():
+    if current_user.role == 'admin':
+        parking_lots = ParkingLot.query.all()
+        return render_template('admin_dashboard.html', parking_lots=parking_lots)
+    return redirect(url_for('auth_routes.admin_login'))
+
+@admin_routes.route('/admin-add-parking-lot', methods=['GET', 'POST'])
+@login_required
+def add_lot():
+    if current_user.role == 'admin':
+        if request.method == 'POST':
+            name = request.form['LotName'].strip()
+            price = float(request.form['Price'])
+            address = request.form['Address'].strip()
+            pin_code = int(request.form['PinCode'])
+            spots_count = int(request.form['SpotsCount'])
+
+            if not re.match(r'(?=.*[A-Z])(?=.*\d).{2,}', name):
+                return render_template('error.html', message="Invalid lot name. Atleast 1 Capital letter as well as 1 number required.", retry_url=url_for('admin_routes.add_lot'))
+            if price < 50:
+                return render_template('error.html', message="Price must be atleast ₹50.", retry_url=url_for('admin_routes.add_lot'))
+            if not (10 <= len(address) <= 100):
+                return render_template('error.html', message="Address should be 10-50 characters long.", retry_url=url_for('admin_routes.add_lot') )
+            if pin_code < 100000 or pin_code > 999999:
+                return render_template('error.html', message="Pincode will be exactly of 6 digits.", retry_url=url_for('admin_routes.add_lot'))
+            if spots_count < 1:
+                return render_template('error.html', message="There must be atleast one parking spot.", retry_url=url_for('admin_routes.add_lot'))
+            
+            new_lot = ParkingLot(name=name, price=price, address=address, pin_code=pin_code, spots_count=spots_count)
+            db.session.add(new_lot)
+            db.session.commit()
+            for _ in range(spots_count):
+                spot = ParkingSpot(lot_id=new_lot.id, status='A')
+                db.session.add(spot)
+            db.session.commit()
+            return redirect(url_for('admin_routes.admin_dashboard'))
+        return render_template('admin_add_parking_lot.html')
+    return redirect(url_for('auth_routes.admin_login'))
+
+@admin_routes.route('/admin-edit-profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    if current_user.role == 'admin':
+        if request.method == 'POST':
+            username = request.form['Username'].strip().lower()
+            password = request.form['Password']
+
+            if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', username):
+                return render_template('error.html', message="Invalid email format.", retry_url=url_for('auth_routes.admin_login'))
+            if not re.match(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,12}$', password):
+                return render_template('error.html', message="Password must be 8-12 characters long with atleast 1 num, and 1 uppercase and 1 lowercase alphabet.", retry_url=url_for('auth_routes.admin_login'))
+
+            current_user.username = username
+            current_user.set_password(password)
+            db.session.commit()
+            return redirect(url_for('admin_routes.admin_dashboard'))
+        return render_template('admin_edit_profile.html')
+    return redirect(url_for('auth_routes.admin_login'))
+
+
+@admin_routes.route('/admin-view-users')
+@login_required
+def user_detail():
+    if current_user.role == 'admin':
+        users = User.query.filter_by(role='user').all()
+        return render_template('admin_view_users.html', users=users)
+    return redirect(url_for('auth_routes.admin_login'))
+
+@admin_routes.route('/admin-view-user/<int:user_id>')
+@login_required
+def view_user(user_id):
+    if current_user.role == 'admin':
+        user = User.query.get_or_404(user_id)
+        reservations = ReserveParkingSpot.query.filter_by(user_id=user_id).all()
+        return render_template('admin_view_user.html', user=user, reservations=reservations)
+    return redirect(url_for('auth_routes.admin_login'))
+
+@admin_routes.route('/admin-edit-parking-lot/<int:lot_id>', methods=['GET', 'POST'])
+@login_required
+def edit_lot(lot_id):
+    if current_user.role == 'admin':
+        lot = ParkingLot.query.get_or_404(lot_id)
+        if request.method == 'POST':
+            name = request.form['LotName'].strip()
+            price = float(request.form['Price'])
+            spots_count = int(request.form['SpotsCount'])
+
+            if not re.match(r'(?=.*[A-Z])(?=.*\d).{2,}', name):
+                return render_template('error.html', message="Invalid lot name. Atleast 1 Capital letter as well as 1 number required.", retry_url=url_for('admin_routes.add_lot'))
+            if price < 50:
+                return render_template('error.html', message="Price must be atleast ₹50.", retry_url=url_for('admin_routes.add_lot'))
+            if spots_count < 1:
+                return render_template('error.html', message="There must be atleast one parking spot.", retry_url=url_for('admin_routes.add_lot'))
+
+            lot.name = name
+            lot.price = price
+            active_spots = ParkingSpot.query.filter_by(lot_id=lot.id, status='A').order_by(ParkingSpot.id.desc()).all()
+            active_count = len(active_spots)
+            if spots_count < active_count:
+                extra_count = active_count - spots_count
+                surplus_spots = active_spots[:extra_count]
+                for spot in surplus_spots:
+                    spot.status = 'I'
+            elif spots_count > active_count:
+                add_count = spots_count - active_count
+                reactivated = 0
+                inactive_spots = ParkingSpot.query.filter_by(lot_id=lot.id, status='I').order_by(ParkingSpot.id.asc()).all()
+                for spot in inactive_spots:
+                    if reactivated < add_count:
+                        spot.status = 'A'
+                        reactivated += 1
+                    else:
+                        break
+                for _ in range(add_count - reactivated):
+                    db.session.add(ParkingSpot(lot_id=lot.id, status='A'))
+            lot.spots_count = spots_count
+            db.session.commit()
+            return redirect(url_for('admin_routes.admin_dashboard'))
+        can_delete_spot = (ParkingSpot.query.filter_by(lot_id=lot_id).filter(ParkingSpot.status == 'O').count() == 0)
+        return render_template('admin_edit_parking_lot.html', lot=lot, can_delete_spot=can_delete_spot)
+    return redirect(url_for('auth_routes.admin_login'))
+
+@admin_routes.route('/admin-delete-parking-lot/<int:lot_id>', methods=['POST'])
+@login_required
+def delete_parking_lot(lot_id):
+    if current_user.role == 'admin':
+        lot = ParkingLot.query.get_or_404(lot_id)
+        active_spots = ParkingSpot.query.filter_by(lot_id=lot.id, status='A').all()
+        for spot in active_spots:
+            spot.status = 'I'
+        db.session.commit()
+        return redirect(url_for('admin_routes.admin_dashboard'))
+    return redirect(url_for('auth_routes.admin_login'))
+
+@admin_routes.route('/admin-view-parking-spot/<int:spot_id>')
+@login_required
+def view_parking_spot(spot_id):
+    if current_user.role == 'admin':
+        spot = ParkingSpot.query.get_or_404(spot_id)
+        if not spot:
+            return render_template('error.html', message="Parking Spot not found.", retry_url=url_for('admin_routes.admin_dashboard'))
+        reservations = ReserveParkingSpot.query.filter_by(spot_id=spot_id).filter(ReserveParkingSpot.leaving_timestamp.isnot(None)).order_by(ReserveParkingSpot.parking_timestamp.desc()).all()
+        active = ReserveParkingSpot.query.filter_by(spot_id=spot_id).filter(ReserveParkingSpot.leaving_timestamp.is_(None)).order_by(ReserveParkingSpot.parking_timestamp.desc()).first()
+        return render_template('admin_view_parking_spot.html', spot=spot, reservations=reservations, active=active)
+    return redirect(url_for('auth_routes.admin_login'))
+
+@admin_routes.route('/admin-delete-parking-spot/<int:spot_id>', methods=['POST'])
+@login_required
+def delete_parking_spot(spot_id):
+    if current_user.role == 'admin':
+        spot = ParkingSpot.query.get_or_404(spot_id)
+        if spot.status != 'A':
+            return render_template('error.html', message="Cannot deactivate the spot as it is not available.", retry_url=url_for('admin_routes.view_parking_spot', spot_id=spot_id))
+        spot.status = 'I'
+        db.session.commit()
+        return redirect(url_for('admin_routes.admin_dashboard'))
+    return redirect(url_for('auth_routes.admin_login'))
+
+@admin_routes.route('/admin-activate-parking-spot/<int:spot_id>', methods=['POST'])
+@login_required
+def activate_parking_spot(spot_id):
+    if current_user.role == 'admin':
+        spot = ParkingSpot.query.get_or_404(spot_id)
+        if spot.status != 'I':
+            return render_template('error.html', message="Cannot activate the available spot.", retry_url=url_for('admin_routes.view_parking_spot', spot_id=spot_id))
+        spot.status = 'A'
+        db.session.commit()
+        return redirect(url_for('admin_routes.admin_dashboard'))
+    return redirect(url_for('auth_routes.admin_login'))
+
+@admin_routes.route('/admin-view-all-parking-records')
+@login_required
+def all_parking_records():
+    if current_user.role == 'admin':
+        records = ReserveParkingSpot.query.order_by(ReserveParkingSpot.id.desc()).all()
+        return render_template('admin_view_all_parking_records.html', records=records)
+    return redirect(url_for('auth_routes.admin_login'))
+
+@admin_routes.route('/admin-summary')
+@login_required
+def admin_summary():
+    if current_user.role == 'admin':
+        lots = ParkingLot.query.all()
+        summary_data = []
+        for lot in lots:
+            revenue = 0.0
+            for spot in lot.spots:
+                for reservation in spot.reservations:
+                    if reservation.leaving_timestamp:
+                        revenue += reservation.total_cost
+            summary_data.append({'lot_name': lot.name, 'total_spots': len(lot.spots), 'available': lot.available, 'occupied': lot.occupied, 'inactive': lot.inactive, 'revenue': revenue})
+        return render_template('admin_summary.html', summary_data=summary_data)
+    return redirect(url_for('auth_routes.admin_login'))
