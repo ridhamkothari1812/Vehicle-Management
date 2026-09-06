@@ -9,7 +9,7 @@ from flask_login import LoginManager
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.sqlite3"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.secret_key = "IITMProjectMay2025"
+app.secret_key = "VehicleParking@2026"
 db.init_app(app)
 
 app.register_blueprint(user_routes)
