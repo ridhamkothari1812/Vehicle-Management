@@ -1,115 +1,398 @@
-# vehicle-parking-app
+# Vehicle Parking
 
-This is the github repo for my MAD1 Project of May2025 Term.  
-Project Statement: https://lnkd.in/dhmBcmav  
-Project Demo Video Report: https://youtu.be/jFex81LihXw  
-Score: S grade(100/100)  
+A multi-user web application designed to manage vehicle parking lots, parking spaces, reservations, and parking records efficiently.
 
-## Vehicle Parking App - V1
+## 📌 Project Overview
 
-It is a multi-user app (one requires an administrator and other users) that manages different parking lots, parking spots and parked vehicles. Assume that this parking app is for 4-wheeler parking.
+**Vehicle Parking** is a web-based parking management system that allows administrators to manage parking lots and parking spaces, while users can reserve available parking spots, manage their parking sessions, and view their parking history.
 
----
+The system is designed for **four-wheeler vehicle parking** and provides separate functionalities for administrators and registered users.
 
-### 23rd June 2025  
-**Milestone1 Completed : Database Models and Schema Setup**  
-Created models for user, admin(predefined user), parking lot, parking spot and reserve parking spot.  
-This database tables are created programmatically using python not manually.  
-Also established relationships wherever required.  
-ie  
-A user can have multiple reserve parking spot history.  
-A parking lot will have multiple parking spots.  
-A parking spots will have multiple reserve parking spots history.
+The application automates parking spot allocation, reservation management, parking duration calculation, and parking cost calculation.
 
 ---
 
-### 29th June 2025  
-**Milestone2 Completed : Authentication and Role-Based Access**  
-Implemented User registration and login with required fields.  
-Created an Admin login in which admin is predifined so no registration.  
-Redirect to role-specific dashboards after login, although dashboards are not yet created.  
-Added sessions so to prevent unauthorized access to routes.  
-ie  
-Without login, user as well as admin cannot access their dashboards.
+## 🎯 Project Objectives
+
+* Manage multiple parking lots from a centralized system.
+* Automatically generate parking spots according to parking lot capacity.
+* Provide secure user registration and authentication.
+* Provide separate dashboards for administrators and users.
+* Allow users to reserve available parking spots.
+* Track parking entry and exit timestamps.
+* Automatically calculate parking duration and parking charges.
+* Maintain complete parking and reservation history.
+* Provide graphical summaries and statistics for parking management.
 
 ---
 
-### 3rd July 2025  
-**Milestone3 Completed : Admin Dashboard and Lot/Spot Management**  
-Added Admin functionalities  
-Create/edit/delete parking lots.  
-View parking lot details and spot status in dashboard.  
-Automatically create parking spots based on the maximum capacity of the lot.  
-View parking spots details ie current and past reservations.  
-Admin will be able to see all the user's and also individual users' track record.
+## 👥 User Roles
+
+### Admin
+
+The administrator can:
+
+* Create, update, and delete parking lots.
+* Manage parking lot capacity and parking spots.
+* View the current status of parking spots.
+* View parking and reservation records.
+* View registered users and their parking records.
+* Monitor parking lot statistics.
+* View graphical summaries of parking activity and revenue.
+
+### User
+
+Registered users can:
+
+* Create an account and log in securely.
+* View available parking lots.
+* Reserve an available parking spot.
+* Occupy and release a parking spot.
+* View active parking sessions.
+* View complete parking history.
+* Track reservation and parking timestamps.
+* View parking duration.
+* View automatically calculated parking costs.
+* Update their profile information.
 
 ---
 
-### 5th July 2025  
-**Milestone4 Completed : User Dashboard and Reservation/Parking System**  
-Added following to User functionalities:  
-View available parking lots.  
-Auto-allocation/Reservation of the first available spot.  
-Occupy and Release a spot while tracking timestamp.  
-Track timestamps for reservation and View parking history.  
-Show duration of parking spot once its released.  
-Auto calculation of total cost once the spot is released.  
-View current active parkings.  
-Edit User details.
+## ⚙️ Key Features
+
+### Authentication & Authorization
+
+* User registration and login.
+* Predefined administrator account.
+* Role-based access control.
+* Protected routes and sessions.
+* Password hashing for secure password storage.
+* Unauthorized users are restricted from accessing protected pages.
+
+### Parking Lot Management
+
+* Create new parking lots.
+* Edit existing parking lot information.
+* Delete parking lots.
+* Automatically generate parking spots based on maximum capacity.
+* View parking spot availability and status.
+
+### Parking Reservation
+
+* View available parking lots.
+* Automatically allocate the first available parking spot.
+* Reserve parking spots without manual spot selection.
+* Maintain reservation history.
+
+### Parking Management
+
+* Occupy reserved parking spots.
+* Release parking spots after use.
+* Record entry and exit timestamps.
+* Automatically calculate parking duration.
+* Automatically calculate the total parking cost.
+
+### History & Reports
+
+* User-specific parking history.
+* Active parking records.
+* Administrative parking records.
+* Parking lot statistics.
+* Revenue and occupancy summaries.
+* Graphical representation of parking data.
+
+### Form Validation & Security
+
+* Frontend form validation using HTML5 and JavaScript.
+* Backend validation using Python.
+* Regular-expression based validation for required fields.
+* Password visibility toggle.
+* Secure password hashing.
 
 ---
 
-### 6th July 2025  
-**Milestone 5 & 6 Completed : Reservation/Parking History and Summary, Slot Time Calculation and Parking Cost**  
-Realised few of the objectives of milestone 5&6 were previously completed in previous milestones unknowingly.  
-Added following functionalites:  
-Added User's ddedicated parking history tab that will contain all past records.  
-Added Chart's to user, that will display various statics wrt Parking Lots.  
-Used base_user_dashboard.html to simplify user tabs.  
-Added dedicated parking record's tab for admin to view.  
-Added admin summary which displays a pie chart and a stacked bar chart along with a table, all of whom has properties related to parking lots.  
-Modified:  
-Logout button to side with edit profile for consistency in both admin and user interface.  
-Also added if else when displaying various records, so if no records are found then will not display table heads.  
-Note: Charts were created using Chart.js, which i learned basics of with the help of documentation as well as youtube videos.(Learned for first time.)
+## 🛠️ Technology Stack
+
+| Technology      | Purpose                                  |
+| --------------- | ---------------------------------------- |
+| **Python**      | Backend development                      |
+| **Flask**       | Web application framework                |
+| **Flask-Login** | Authentication and session management    |
+| **SQLAlchemy**  | Database ORM                             |
+| **SQLite**      | Database                                 |
+| **HTML5**       | Frontend structure                       |
+| **CSS3**        | Styling                                  |
+| **JavaScript**  | Client-side functionality and validation |
+| **Chart.js**    | Data visualization                       |
+| **Jinja2**      | Dynamic HTML templating                  |
 
 ---
 
-### CORE FUNCTIONALITIES ARE COMPLETED WITH MAYBE FEW PARTIAL RECOMMENDED/OPTIONAL ENHANCEMENTS
+## 🗂️ Core Modules
+
+The application is divided into the following major modules:
+
+1. **Authentication Module**
+
+   * Registration
+   * Login
+   * Logout
+   * Password management
+   * Role-based access
+
+2. **Admin Module**
+
+   * Dashboard
+   * Parking lot management
+   * Parking spot management
+   * User management
+   * Parking records
+   * Statistics and summaries
+
+3. **User Module**
+
+   * User dashboard
+   * Parking lot browsing
+   * Reservation
+   * Active parking
+   * Parking history
+   * Profile management
+
+4. **Parking Management Module**
+
+   * Spot allocation
+   * Reservation tracking
+   * Occupancy management
+   * Spot release
+   * Duration calculation
+   * Cost calculation
+
+5. **Analytics Module**
+
+   * Parking statistics
+   * Parking lot summaries
+   * Revenue visualization
+   * Occupancy visualization
 
 ---
 
-### 9th July 2025
-**Milestone: Flask Login Integration and Security, Milestone: Charts and Visualization**  
-Integrate Flask-Login and Restrict routes and protect sessions.  
-This was done by using flask-login package.  
-Logins were managed by LoginManager, it redirects to userlogin by default if not logged in with decorator(login_manager which implemets a method of usermixin).  
-And added password storage hashing using werkzeug.security, by adding methods to the user db logic(set and check password implementing generate and check password hash respectively).  
-Charts and Visualizations were previously unknowingly completed while completing milestone5&6.  
+## 🗄️ Database Design
+
+The application uses a relational database to maintain parking and user information.
+
+The major entities include:
+
+* **User**
+* **Admin**
+* **Parking Lot**
+* **Parking Spot**
+* **Reserve Parking Spot**
+
+### Relationships
+
+* A user can have multiple parking/reservation records.
+* A parking lot can contain multiple parking spots.
+* A parking spot can have multiple reservation records over time.
+* Parking records maintain information about reservation, occupancy, release time, duration, and cost.
+
+The database tables are created programmatically through the application rather than being manually created.
 
 ---
 
-### 10th July 2025
-**Milestone: Frontend and Backend Validation**
-Added form validation using HTML5 and also with the help of JS in user registration.  
-With the help of JS made toggle button to see the password.  
-Form validation both frontend and backend were done using RE[Regular Expressions], RE's were taken from popular websites by quick google search, easier RE's were formulated by myself such as name restrictions.  
-User re library for matching on backend side.  
+## 🚀 Installation & Setup
+
+### 1. Clone the repository
+
+```bash
+git clone <YOUR_GITHUB_REPOSITORY_URL>
+cd vehicle-parking
+```
+
+### 2. Create a virtual environment
+
+```bash
+python -m venv venv
+```
+
+### 3. Activate the virtual environment
+
+**Windows:**
+
+```bash
+venv\Scripts\activate
+```
+
+**Linux / macOS:**
+
+```bash
+source venv/bin/activate
+```
+
+### 4. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 5. Run the application
+
+```bash
+python app.py
+```
+
+The application will start on the local Flask development server.
+
+Open the URL shown in the terminal in your web browser.
 
 ---
 
-### 13th July 2025
-**Final Project Completed**
-Solved an unexpected error, although it was pretty silly.  
-Errors  
-1 Admin summary would crash if any spot is occupied.  
-2 Admin view spot would crash if we want to view details of occupied spot.  
-Crash Reasons(respectively)  
-1 Bad revenue calculation  
-2 Didn't filter active spots.
-Solutions(resectively)  
-1 Added if statement  
-2 Added filer in db query  
-Additional Changes  
-Slight modification of constraints in ParkingLot and ReserveParkingSpot db.  
-Finally added Project report with video.
+## 🔐 Authentication
+
+The application supports two types of access:
+
+**Administrator**
+
+* Uses the predefined administrator credentials.
+* Has access to administrative features and parking management.
+
+**User**
+
+* Creates an account through registration.
+* Logs in using registered credentials.
+* Has access to user-specific parking functionality.
+
+> Update the administrator credentials according to the configuration present in the project before deployment.
+
+---
+
+## 📊 Dashboard & Visualization
+
+The application provides dashboards for both administrators and users.
+
+The administrative dashboard provides an overview of parking activity through:
+
+* Parking lot statistics
+* Occupancy information
+* Revenue-related information
+* Graphical charts
+* Parking records
+
+Charts and visualizations are implemented using **Chart.js**.
+
+---
+
+## 🔄 Parking Workflow
+
+The basic parking workflow is:
+
+```text
+User Registration
+       ↓
+User Login
+       ↓
+View Available Parking Lots
+       ↓
+Reserve Available Parking Spot
+       ↓
+Occupy Parking Spot
+       ↓
+Vehicle Parking Session
+       ↓
+Release Parking Spot
+       ↓
+Calculate Parking Duration
+       ↓
+Calculate Parking Cost
+       ↓
+Store Parking History
+```
+
+---
+
+## 🧪 Validation & Error Handling
+
+The application includes validation at both frontend and backend levels.
+
+* Required-field validation.
+* Input format validation.
+* User registration validation.
+* Password validation.
+* Backend input validation.
+* Handling of empty parking records.
+* Handling of occupied parking spots.
+* Validation of parking-related calculations.
+
+Additional error handling has been implemented to prevent dashboard and parking-detail pages from failing when certain parking records are unavailable or currently active.
+
+---
+
+## 🔮 Future Enhancements
+
+The application can be further enhanced with:
+
+* Online payment integration.
+* QR-based parking entry and exit.
+* Vehicle number plate recognition.
+* Real-time parking availability.
+* Email/SMS notifications.
+* Multiple vehicle types and pricing plans.
+* Advanced analytics and reporting.
+* Cloud database integration.
+* REST API integration.
+* Mobile application support.
+* Deployment on a cloud platform.
+
+---
+
+## 📁 Project Structure
+
+The project follows a Flask-based application structure consisting of:
+
+```text
+vehicle-parking/
+│
+├── app.py
+├── requirements.txt
+├── README.md
+│
+├── templates/
+│   ├── admin/
+│   ├── user/
+│   └── ...
+│
+├── static/
+│   ├── css/
+│   ├── js/
+│   └── ...
+│
+├── database/
+│   └── ...
+│
+└── other project files
+```
+
+*The exact structure may vary depending on the current implementation of the project.*
+
+---
+
+## 📌 Project Status
+
+**Project Status: Completed**
+
+The core parking management functionality, authentication, reservation system, parking history, cost calculation, validation, dashboards, and data visualization have been implemented.
+
+---
+
+## 👨‍💻 Project Information
+
+**Project Title:** Vehicle Parking
+**Project Type:** Web Application
+**Domain:** Parking Management System
+**Backend:** Python / Flask
+**Database:** SQLite
+**Frontend:** HTML, CSS & JavaScript
+
+---
+
+## 📄 License
+
+This project is intended for academic and educational purposes.
