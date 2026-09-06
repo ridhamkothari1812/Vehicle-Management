@@ -203,8 +203,8 @@ The database tables are created programmatically through the application rather 
 ### 1. Clone the repository
 
 ```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
-cd vehicle-parking
+git clone https://github.com/ridhamkothari1812/Vehicle-Parking.git
+cd Vehicle-Parking
 ```
 
 ### 2. Create a virtual environment
@@ -353,21 +353,25 @@ vehicle-parking/
 ├── app.py
 ├── requirements.txt
 ├── README.md
+├── .gitignore
 │
-├── templates/
-│   ├── admin/
-│   ├── user/
+├── models/
 │   └── ...
+│
+├── routes/
+│   ├── auth_routes.py
+│   ├── user_routes.py
+│   └── admin_routes.py
 │
 ├── static/
 │   ├── css/
 │   ├── js/
 │   └── ...
 │
-├── database/
-│   └── ...
-│
-└── other project files
+└── templates/
+    ├── admin/
+    ├── user/
+    └── ...
 ```
 
 *The exact structure may vary depending on the current implementation of the project.*
